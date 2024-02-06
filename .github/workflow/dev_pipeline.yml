@@ -1,28 +1,47 @@
-# name: Deploy to Ubuntu Instance
+name: Deploy to Ubuntu Instance
 
-# on:
-#   push:
-#     branches:
-#       - main
+on:
+  push:
+    branches:
+      - main
 
-# jobs:
-#   deploy:
-#     runs-on: ubuntu-latest
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v2
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-#       - name: Set up Node.js
-#         uses: actions/setup-node@v3
-#         with:
-#           node-version: 16
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
 
-#       - name: Install dependencies and build
-#         run: |
-#           npm install
-#           npm run build
+      - name: Install dependencies and build
+        run: |
+          npm install
+          npm run build
 
-#       - name: Copy build to Lightsail
-#         run: |
-#           scp -r dist/* ubuntu@YOUR_INSTANCE_IP:/var/www/html
+      # Add the SSH deploy step
+      - name: Deploy to Lightsail
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.HOST_DNS }}
+          REMOTE_USER: ${{ secrets.USERNAME }}
+          TARGET: ${{secrets.TARGET_DIR}}
+
+      # Reload HTTP server
+      - name: Reload HTTP server
+        run: |
+          sudo service http-server restart
+
+      - name: Stop HTTP server
+        run: |
+          sudo service http-server stop
+
+      # Start HTTP server
+      - name: Start HTTP server
+        run: |
+          sudo service http-server start
