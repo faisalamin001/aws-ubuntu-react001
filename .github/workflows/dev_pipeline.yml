@@ -22,6 +22,13 @@ jobs:
         run: |
           npm install
           npm run build
+      - name: print vars
+        run: echo ${{ secrets.LIGHTSAIL_SSH_KEY }}
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.HOST_DNS }}
+          REMOTE_USER: ${{ secrets.USERNAME }}
+          TARGET: ${{secrets.TARGET_DIR}}
 
       # Add the SSH deploy step
       - name: Deploy to Lightsail
@@ -31,8 +38,6 @@ jobs:
           REMOTE_HOST: ${{ secrets.HOST_DNS }}
           REMOTE_USER: ${{ secrets.USERNAME }}
           TARGET: ${{secrets.TARGET_DIR}}
-      - name: print vars
-        run: echo ${{ secrets.LIGHTSAIL_SSH_KEY }}
 
       # Reload HTTP server
       - name: Reload HTTP server
