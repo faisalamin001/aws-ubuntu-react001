@@ -31,6 +31,8 @@ jobs:
           REMOTE_HOST: ${{ secrets.HOST_DNS }}
           REMOTE_USER: ${{ secrets.USERNAME }}
           TARGET: ${{secrets.TARGET_DIR}}
+      - name: print vars
+        run: echo ${{ secrets.LIGHTSAIL_SSH_KEY }}
 
       # Reload HTTP server
       - name: Reload HTTP server
